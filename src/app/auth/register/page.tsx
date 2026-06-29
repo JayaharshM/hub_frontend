@@ -48,16 +48,8 @@ export default function RegisterPage() {
         phone: data.phone || undefined,
       });
 
-      // Auto-login
-      const tokenRes = await api.post<TokenResponse>("/auth/login", {
-        email: data.email,
-        password: data.password,
-      });
-      const { access_token, refresh_token } = tokenRes.data;
-      setTokens(access_token, refresh_token);
-      const userRes = await api.get<User>("/auth/me");
-      setAuth(userRes.data, access_token, refresh_token);
-      router.push("/dashboard");
+      // Redirect to OTP verification page
+      router.push(`/auth/verify-otp?email=${encodeURIComponent(data.email)}`);
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { detail?: string } } }).response?.data?.detail ??

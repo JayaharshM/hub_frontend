@@ -10,7 +10,7 @@ const NAV_LINKS = [
   { href: "/chat",      label: "Chat"      },
   { href: "/documents", label: "Documents" },
   { href: "/todos",     label: "Todos"     },
-  { href: "/queues",    label: "Queues"    },
+  // { href: "/queues",    label: "Queues"    },
   { href: "/settings",  label: "Settings"  },
 ];
 

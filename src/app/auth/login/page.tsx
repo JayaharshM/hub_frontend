@@ -118,12 +118,20 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <p className="text-center text-sm mt-5 text-gray-500">
-              Don&apos;t have an account?{" "}
-              <Link href="/auth/register" className="text-cixio-blue font-medium hover:text-cixio-navy transition-colors">
-                Create one
-              </Link>
-            </p>
+            <div className="flex flex-col items-center gap-2 mt-5 text-sm text-gray-500">
+              <p>
+                Don&apos;t have an account?{" "}
+                <Link href="/auth/register" className="text-cixio-blue font-medium hover:text-cixio-navy transition-colors">
+                  Create one
+                </Link>
+              </p>
+              <p>
+                Need to verify your email?{" "}
+                <Link href="/auth/verify-otp" className="text-cixio-blue font-medium hover:text-cixio-navy transition-colors">
+                  Verify OTP
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>

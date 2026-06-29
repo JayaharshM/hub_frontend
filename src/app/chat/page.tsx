@@ -11,14 +11,14 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (!isLoading && !isPending) {
-      // If there are existing sessions, redirect to the first one
       if (sessions && sessions.length > 0) {
-        router.push("/chat/default");
+        // Redirect to the most recent session
+        router.push(`/chat/${sessions[0].id}`);
       } else {
-        // Otherwise create a new session
+        // Otherwise create a new session and redirect to it
         createSession(undefined, {
-          onSuccess: () => {
-            router.push("/chat/default");
+          onSuccess: (newSession) => {
+            router.push(`/chat/${newSession.id}`);
           },
         });
       }

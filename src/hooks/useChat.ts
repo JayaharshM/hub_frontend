@@ -3,7 +3,6 @@ import api from "@/lib/api";
 import { ChatSession, ChatMessage } from "@/types";
 
 const LOCAL_SESSIONS_KEY = "cixio_chat_sessions";
-const BACKEND_AVAILABLE_KEY = "cixio_chat_backend_available";
 
 function loadLocalSessions(): ChatSession[] {
   if (typeof window === "undefined") return [];
@@ -41,12 +40,12 @@ function loadLocalMessages(sessionId: string): ChatMessage[] {
   }
 }
 
-function saveLocalMessages(sessionId: string, messages: ChatMessage[]) {
+export function saveLocalMessages(sessionId: string, messages: ChatMessage[]) {
   if (typeof window === "undefined") return;
   localStorage.setItem(`cixio_chat_messages:${sessionId}`, JSON.stringify(messages));
 }
 
-function createLocalMessage(sessionId: string, role: ChatMessage["role"], content: string): ChatMessage {
+export function createLocalMessage(sessionId: string, role: ChatMessage["role"], content: string): ChatMessage {
   return {
     id: `local-msg-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     session_id: sessionId,
@@ -84,7 +83,7 @@ export function useCreateSession() {
         console.warn("Backend POST /chat/sessions failed, falling back to local session:", err);
         const session = createLocalSession();
         const sessions = loadLocalSessions();
-        const nextSessions = [...sessions, session];
+        const nextSessions = [session, ...sessions];
         saveLocalSessions(nextSessions);
         return session;
       }
@@ -101,6 +100,9 @@ export function useMessages(sessionId: string | null) {
     queryKey: ["chat-messages", sessionId],
     queryFn: async () => {
       if (!sessionId) return [];
+      if (sessionId.startsWith("local-")) {
+        return loadLocalMessages(sessionId);
+      }
       try {
         const res = await api.get(`/chat/sessions/${sessionId}/messages`);
         return res.data;
@@ -109,7 +111,7 @@ export function useMessages(sessionId: string | null) {
         return loadLocalMessages(sessionId);
       }
     },
-    enabled: !!sessionId, // don't run until a session is actually selected
+    enabled: !!sessionId,
   });
 }
 
@@ -118,6 +120,15 @@ export function useDeleteSession() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (sessionId: string) => {
+      if (sessionId.startsWith("local-")) {
+        const sessions = loadLocalSessions();
+        const nextSessions = sessions.filter((s) => s.id !== sessionId);
+        saveLocalSessions(nextSessions);
+        if (typeof window !== "undefined") {
+          localStorage.removeItem(`cixio_chat_messages:${sessionId}`);
+        }
+        return;
+      }
       await api.delete(`/chat/sessions/${sessionId}`);
     },
     onSuccess: () => {

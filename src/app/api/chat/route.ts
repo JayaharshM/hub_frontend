@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
       const interval = setInterval(() => {
         if (i >= words.length) {
-          controller.enqueue(encoder.encode('event: done\n\n'));
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
           controller.close();
           clearInterval(interval);
           return;
